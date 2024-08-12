@@ -6,7 +6,7 @@
 /*   By: phartman <phartman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 16:43:34 by phartman          #+#    #+#             */
-/*   Updated: 2024/07/31 18:14:51 by phartman         ###   ########.fr       */
+/*   Updated: 2024/08/12 17:27:19 by phartman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,18 +32,23 @@ typedef struct t_vars
 	unsigned int time_to_sleep;
 	unsigned int nr_of_meals;
 	pthread_mutex_t *forks;
-	t_philo *philos;
+	pthread_t *philos;
 }				t_vars;
 
+// typedef struct t_philo
+// {
+// 	pthread_t *thread;
+// 	unsigned int id;
+// 	unsigned int nr_of_meals;
+// 	unsigned int last_meal;
+// 	pthread_mutex_t *left_fork;
+// 	pthread_mutex_t *right_fork;
+// 	pthread_mutex_t *print_mutex;
+// 	t_vars *vars;
+// }				t_philo;
 typedef struct t_philo
 {
-	pthread_t *thread;
-	unsigned int id;
-	unsigned int nr_of_meals;
-	unsigned int last_meal;
-	pthread_mutex_t *left_fork;
-	pthread_mutex_t *right_fork;
-	pthread_mutex_t *print_mutex;
+	int id;
 	t_vars *vars;
 }				t_philo;
 

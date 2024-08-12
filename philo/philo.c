@@ -6,7 +6,7 @@
 /*   By: phartman <phartman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 16:44:45 by phartman          #+#    #+#             */
-/*   Updated: 2024/08/12 18:08:29 by phartman         ###   ########.fr       */
+/*   Updated: 2024/08/12 18:12:11 by phartman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ int higher_fork = left < right ? right : left;
 	
 		//eat
 		gettimeofday(&tv, NULL);
-		printf("◦ %ld.%06ld %d is eating", tv.tv_sec, tv.tv_usec, id);
+		printf("◦ %ld.%06ld %d is eating\n", tv.tv_sec, tv.tv_usec, id);
 		usleep(vars->time_to_eat * 1000);
 		
 		//release forks
@@ -61,7 +61,7 @@ int higher_fork = left < right ? right : left;
 
 		//sleep
 		gettimeofday(&tv, NULL);
-		printf("◦ %ld.%06ld %d is sleeping", tv.tv_sec, tv.tv_usec, id);
+		printf("◦ %ld.%06ld %d is sleeping/n", tv.tv_sec, tv.tv_usec, id);
 		usleep(vars->time_to_sleep * 1000);
 
 		//check death
@@ -114,7 +114,7 @@ void	create_threads(t_vars *vars)
 	while (i < vars->nr_of_philos)
 	{
 		philo[i].id = i;
-		philo[i].vars = &vars;
+		philo[i].vars = vars;
 		pthread_create(&vars->philos[i], NULL, philo_action,
 			&philo[i]);
 		i++;

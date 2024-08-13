@@ -6,7 +6,7 @@
 /*   By: phartman <phartman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 16:44:45 by phartman          #+#    #+#             */
-/*   Updated: 2024/08/13 21:45:57 by phartman         ###   ########.fr       */
+/*   Updated: 2024/08/13 23:05:18 by phartman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,9 +45,9 @@ void safe_sleep(long long wait_time, t_vars *vars)
 	i = get_time();
 	while(!(vars->died))
 	{
-		if(get_time_diff(i, get_time()) < wait_time)
+		if(get_time_diff(i, get_time()) >= wait_time)
 			break;
-		usleep(50);
+		usleep(100);
 	}
 	
 		
@@ -91,6 +91,7 @@ void eat(t_philo *philo)
 		int right;
 		t_vars *vars;
 
+		
 		vars = philo->vars; 
 		left = philo->id;
 		right = (philo->id + 1) % vars->nr_of_forks;
@@ -100,6 +101,12 @@ void eat(t_philo *philo)
 		
 		pthread_mutex_lock(&vars->forks[lower_fork]);
 		safe_print(vars, philo->id, "has taken a fork");
+		if (vars->nr_of_philos == 1)
+		{
+			safe_sleep(vars->time_to_die, vars);
+			pthread_mutex_unlock(&vars->forks[lower_fork]);
+			return ;
+		}
 		pthread_mutex_lock(&vars->forks[higher_fork]);
 		safe_print(vars, philo->id, "has taken a fork");
 		
@@ -124,7 +131,7 @@ void	*philo_action(void *arg)
 	while(!vars->died)
 	{
 		eat(philo);
-		if(vars->all_full)
+		if(vars->all_full || vars->died)
 			break;
 		//sleep
 		safe_print(vars, philo->id, "is sleeping");
@@ -207,7 +214,6 @@ void	create_mutexes(t_vars *vars)
 }
 
 void	join_threads(t_vars *vars)
-
 {
 	unsigned int	i;
 
@@ -215,11 +221,12 @@ void	join_threads(t_vars *vars)
 	while (i < vars->nr_of_philos)
 	{
 		 printf("Joining thread %u\n", i);
-		 pthread_join(vars->philos[i++].thread, NULL);
+		 pthread_join(vars->philos[i].thread, NULL);
 		 printf("Joined thread %u\n", i);
+		 i++;
 	}
-		
 	free(vars->philos);
+	
 }
 
 void	destroy_mutexes(t_vars *vars)

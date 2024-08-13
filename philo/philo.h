@@ -6,7 +6,7 @@
 /*   By: phartman <phartman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 16:43:34 by phartman          #+#    #+#             */
-/*   Updated: 2024/08/13 18:48:23 by phartman         ###   ########.fr       */
+/*   Updated: 2024/08/13 20:26:20 by phartman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,8 @@ typedef struct s_philo
 {
 	int id;
 	int meals_eaten;
-
+	int left_fork_id;
+	int right_fork_id;
 	long long last_meal;
 	pthread_t thread;
 	struct s_vars *vars;

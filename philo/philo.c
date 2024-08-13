@@ -6,7 +6,7 @@
 /*   By: phartman <phartman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 16:44:45 by phartman          #+#    #+#             */
-/*   Updated: 2024/08/13 19:36:36 by phartman         ###   ########.fr       */
+/*   Updated: 2024/08/13 21:02:45 by phartman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,11 +164,19 @@ void	create_threads(t_vars *vars)
 
 	i = 0;
 	vars->philos = malloc(vars->nr_of_philos * sizeof(t_philo));
+	if(vars->philos == NULL)
+	{
+		printf("malloc failed");
+		exit(1);
+	}
+		
 	while (i < vars->nr_of_philos)
 	{
 		vars->philos[i].id = i;
 		vars->philos[i].vars = vars;
 		vars->philos[i].meals_eaten = 0;
+		vars->philos[i].left_fork_id = i;
+		vars->philos[i].right_fork_id = (i + 1) % vars->nr_of_philos;
 		vars->philos[i].last_meal = get_time();
 		if(pthread_create(&vars->philos[i].thread, NULL, philo_action,
 			&vars->philos[i]) != 0)
@@ -198,7 +206,12 @@ void	join_threads(t_vars *vars)
 
 	i = 0;
 	while (i < vars->nr_of_philos)
-		pthread_join(vars->philos[i++].thread, NULL);
+	{
+		 printf("Joining thread %u\n", i);
+		 pthread_join(vars->philos[i++].thread, NULL);
+		 printf("Joined thread %u\n", i);
+	}
+		
 	free(vars->philos);
 }
 
@@ -232,6 +245,8 @@ int	main(int argc, char const *argv[])
 	vars.time_to_sleep = ft_atoi(argv[4]);
 	vars.died = 0;
 	vars.all_full = 0;
+	if(vars.nr_of_philos < 1 || vars.nr_of_philos > 200)
+
 	if (argc == 6)
 		vars.nr_of_meals = ft_atoi(argv[5]);
 	else
@@ -240,7 +255,8 @@ int	main(int argc, char const *argv[])
 	create_mutexes(&vars);
 	create_threads(&vars);
 	death_checker(&vars);
-	join_threads(&vars);
 	destroy_mutexes(&vars);
+	join_threads(&vars);
+	
 	return (0);
 }

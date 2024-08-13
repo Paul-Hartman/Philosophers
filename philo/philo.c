@@ -6,7 +6,7 @@
 /*   By: phartman <phartman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 16:44:45 by phartman          #+#    #+#             */
-/*   Updated: 2024/08/13 23:05:18 by phartman         ###   ########.fr       */
+/*   Updated: 2024/08/13 23:36:20 by phartman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ void safe_print(t_vars *vars, int id, char *string)
 	pthread_mutex_unlock(&vars->printing);
 }
 
+
 void safe_sleep(long long wait_time, t_vars *vars)
 {
 	long long i;
@@ -47,7 +48,7 @@ void safe_sleep(long long wait_time, t_vars *vars)
 	{
 		if(get_time_diff(i, get_time()) >= wait_time)
 			break;
-		usleep(100);
+		usleep(50);
 	}
 	
 		
@@ -99,20 +100,43 @@ void eat(t_philo *philo)
 		int higher_fork = left < right ? right : left;
 			//take forks
 		
-		pthread_mutex_lock(&vars->forks[lower_fork]);
-		safe_print(vars, philo->id, "has taken a fork");
-		if (vars->nr_of_philos == 1)
-		{
-			safe_sleep(vars->time_to_die, vars);
-			pthread_mutex_unlock(&vars->forks[lower_fork]);
-			return ;
-		}
-		pthread_mutex_lock(&vars->forks[higher_fork]);
-		safe_print(vars, philo->id, "has taken a fork");
-		
+		// pthread_mutex_lock(&vars->forks[lower_fork]);
+		// safe_print(vars, philo->id, "has taken a fork");
+		// if (vars->nr_of_philos == 1)
+		// {
+		// 	safe_sleep(vars->time_to_die, vars);
+		// 	pthread_mutex_unlock(&vars->forks[lower_fork]);
+		// 	return ;
+		// }
+		// pthread_mutex_lock(&vars->forks[higher_fork]);
+		// safe_print(vars, philo->id, "has taken a fork");
+		  // Take forks
+     if ((unsigned int)philo->id == vars->nr_of_philos - 1) {
+        // Last philosopher picks up the higher fork first
+        pthread_mutex_lock(&vars->forks[higher_fork]);
+        safe_print(vars, philo->id, "has taken a fork");
+        pthread_mutex_lock(&vars->forks[lower_fork]);
+        safe_print(vars, philo->id, "has taken a fork");
+    } else {
+        // Other philosophers pick up the lower fork first
+        pthread_mutex_lock(&vars->forks[lower_fork]);
+        safe_print(vars, philo->id, "has taken a fork");
+        if (vars->nr_of_philos == 1) {
+            safe_sleep(vars->time_to_die, vars);
+            pthread_mutex_unlock(&vars->forks[lower_fork]);
+            return;
+        }
+        pthread_mutex_lock(&vars->forks[higher_fork]);
+        safe_print(vars, philo->id, "has taken a fork");
+    }
+
 		//eat
+		pthread_mutex_lock(&vars->check_meal);
+	
 		safe_print(vars, philo->id, "is eating");
 		philo->last_meal = get_time();
+		pthread_mutex_unlock(&vars->check_meal);
+		
 		safe_sleep(vars->time_to_eat, vars);
 		philo->meals_eaten++;
 
@@ -127,11 +151,12 @@ void	*philo_action(void *arg)
 	t_philo *philo; 
 	philo = (t_philo *)arg;
 	vars = philo->vars;
-
+//	if (philo->id % 2 == 0)
+       // usleep(15000);
 	while(!vars->died)
 	{
 		eat(philo);
-		if(vars->all_full || vars->died)
+		if(vars->all_full)
 			break;
 		//sleep
 		safe_print(vars, philo->id, "is sleeping");

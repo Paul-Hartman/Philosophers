@@ -6,7 +6,7 @@
 /*   By: phartman <phartman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 16:44:45 by phartman          #+#    #+#             */
-/*   Updated: 2024/08/13 23:36:20 by phartman         ###   ########.fr       */
+/*   Updated: 2024/08/14 00:43:21 by phartman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ long long get_time(void)
 	struct timeval t;
 
 	gettimeofday(&t, NULL);
-	return ((t.tv_sec * 1000) + (t.tv_usec/1000));
+	return ((t.tv_sec * 1000+ t.tv_usec/1000));
 
 }
 
@@ -73,7 +73,7 @@ void death_checker(t_vars *vars)
 				vars->died = 1;
 			}
 			pthread_mutex_unlock(&vars->check_meal);
-			usleep(100);
+			//usleep(100);
 			if (vars->philos[i].meals_eaten == vars->nr_of_meals && vars->nr_of_meals != -1)
 				j++;
 			
@@ -96,39 +96,22 @@ void eat(t_philo *philo)
 		vars = philo->vars; 
 		left = philo->id;
 		right = (philo->id + 1) % vars->nr_of_forks;
-		int lower_fork = left < right ? left : right;
-		int higher_fork = left < right ? right : left;
+		//int lower_fork = left < right ? left : right;
+		//int higher_fork = left < right ? right : left;
 			//take forks
 		
-		// pthread_mutex_lock(&vars->forks[lower_fork]);
-		// safe_print(vars, philo->id, "has taken a fork");
-		// if (vars->nr_of_philos == 1)
-		// {
-		// 	safe_sleep(vars->time_to_die, vars);
-		// 	pthread_mutex_unlock(&vars->forks[lower_fork]);
-		// 	return ;
-		// }
-		// pthread_mutex_lock(&vars->forks[higher_fork]);
-		// safe_print(vars, philo->id, "has taken a fork");
-		  // Take forks
-     if ((unsigned int)philo->id == vars->nr_of_philos - 1) {
-        // Last philosopher picks up the higher fork first
-        pthread_mutex_lock(&vars->forks[higher_fork]);
-        safe_print(vars, philo->id, "has taken a fork");
-        pthread_mutex_lock(&vars->forks[lower_fork]);
-        safe_print(vars, philo->id, "has taken a fork");
-    } else {
-        // Other philosophers pick up the lower fork first
-        pthread_mutex_lock(&vars->forks[lower_fork]);
-        safe_print(vars, philo->id, "has taken a fork");
-        if (vars->nr_of_philos == 1) {
-            safe_sleep(vars->time_to_die, vars);
-            pthread_mutex_unlock(&vars->forks[lower_fork]);
-            return;
-        }
-        pthread_mutex_lock(&vars->forks[higher_fork]);
-        safe_print(vars, philo->id, "has taken a fork");
-    }
+		pthread_mutex_lock(&vars->forks[right]);
+		safe_print(vars, philo->id, "has taken a fork");
+		if (vars->nr_of_philos == 1)
+		{
+			safe_sleep(vars->time_to_die, vars);
+			pthread_mutex_unlock(&vars->forks[right]);
+			return ;
+		}
+		pthread_mutex_lock(&vars->forks[left]);
+		safe_print(vars, philo->id, "has taken a fork");
+		
+     
 
 		//eat
 		pthread_mutex_lock(&vars->check_meal);
@@ -141,8 +124,8 @@ void eat(t_philo *philo)
 		philo->meals_eaten++;
 
 		//release forks
-		pthread_mutex_unlock(&vars->forks[higher_fork]);
-		pthread_mutex_unlock(&vars->forks[lower_fork]);
+		pthread_mutex_unlock(&vars->forks[left]);
+		pthread_mutex_unlock(&vars->forks[right]);
 }
 
 void	*philo_action(void *arg)
@@ -151,8 +134,8 @@ void	*philo_action(void *arg)
 	t_philo *philo; 
 	philo = (t_philo *)arg;
 	vars = philo->vars;
-//	if (philo->id % 2 == 0)
-       // usleep(15000);
+	if (philo->id % 2 == 0)
+			safe_sleep(1, vars);
 	while(!vars->died)
 	{
 		eat(philo);

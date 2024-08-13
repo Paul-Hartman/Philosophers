@@ -6,7 +6,7 @@
 /*   By: phartman <phartman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 16:44:45 by phartman          #+#    #+#             */
-/*   Updated: 2024/08/13 21:02:45 by phartman         ###   ########.fr       */
+/*   Updated: 2024/08/13 21:45:57 by phartman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,14 @@ void safe_sleep(long long wait_time, t_vars *vars)
 	long long i;
 
 	i = get_time();
-	while(!(vars->died) && get_time_diff(i, get_time()) < wait_time)
+	while(!(vars->died))
+	{
+		if(get_time_diff(i, get_time()) < wait_time)
+			break;
 		usleep(50);
+	}
+	
+		
 }
 
 
@@ -201,6 +207,7 @@ void	create_mutexes(t_vars *vars)
 }
 
 void	join_threads(t_vars *vars)
+
 {
 	unsigned int	i;
 
@@ -245,7 +252,7 @@ int	main(int argc, char const *argv[])
 	vars.time_to_sleep = ft_atoi(argv[4]);
 	vars.died = 0;
 	vars.all_full = 0;
-	if(vars.nr_of_philos < 1 || vars.nr_of_philos > 200)
+	//if(vars.nr_of_philos < 1 || vars.nr_of_philos > 200)
 
 	if (argc == 6)
 		vars.nr_of_meals = ft_atoi(argv[5]);

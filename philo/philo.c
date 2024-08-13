@@ -6,95 +6,125 @@
 /*   By: phartman <phartman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 16:44:45 by phartman          #+#    #+#             */
-/*   Updated: 2024/08/12 20:09:38 by phartman         ###   ########.fr       */
+/*   Updated: 2024/08/13 19:36:36 by phartman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
 
-int check_time_to_die(struct timeval tv, struct timeval last_meal, t_philo *philo)
+long long get_time_diff(long long cur_time, long long last_meal)
 {
-	long int diff;
-	diff = (tv.tv_sec - last_meal.tv_sec) * 1000000 + tv.tv_usec - last_meal.tv_usec;
-	if(diff > philo->vars->time_to_die * 1000)
+	long long diff;
+
+	diff = cur_time- last_meal;
+	return (diff);
+}
+
+long long get_time(void)
+{
+	struct timeval t;
+
+	gettimeofday(&t, NULL);
+	return ((t.tv_sec * 1000) + (t.tv_usec/1000));
+
+}
+
+void safe_print(t_vars *vars, int id, char *string)
+{
+	pthread_mutex_lock(&vars->printing);
+	if(!vars->died)
+		printf("%lli %i %s\n", get_time(), id, string);
+	pthread_mutex_unlock(&vars->printing);
+}
+
+void safe_sleep(long long wait_time, t_vars *vars)
+{
+	long long i;
+
+	i = get_time();
+	while(!(vars->died) && get_time_diff(i, get_time()) < wait_time)
+		usleep(50);
+}
+
+
+void death_checker(t_vars *vars)
+{
+	unsigned int i;
+	unsigned int j;
+
+	while(!vars->all_full)
 	{
-		printf("◦ %ld.%06ld %d died\n", tv.tv_sec, tv.tv_usec, philo->id);
-		philo->vars->died = 1;
-		return (1);
+		i = 0;
+		j = 0;
+		while (i < vars->nr_of_philos && !(vars->died))
+		{
+			pthread_mutex_lock(&vars->check_meal);
+			if (get_time_diff(get_time(), vars->philos[i].last_meal) > vars->time_to_die)
+			{
+				safe_print(vars, i, "has died");
+				vars->died = 1;
+			}
+			pthread_mutex_unlock(&vars->check_meal);
+			usleep(100);
+			if (vars->philos[i].meals_eaten == vars->nr_of_meals && vars->nr_of_meals != -1)
+				j++;
+			
+			i++;
+		}
+		if (vars->died)
+			break ;
+		if (j == vars->nr_of_philos)
+			vars->all_full = 1;
 	}
-	return (0);
+}
+
+void eat(t_philo *philo)
+{
+		int left;
+		int right;
+		t_vars *vars;
+
+		vars = philo->vars; 
+		left = philo->id;
+		right = (philo->id + 1) % vars->nr_of_forks;
+		int lower_fork = left < right ? left : right;
+		int higher_fork = left < right ? right : left;
+			//take forks
+		
+		pthread_mutex_lock(&vars->forks[lower_fork]);
+		safe_print(vars, philo->id, "has taken a fork");
+		pthread_mutex_lock(&vars->forks[higher_fork]);
+		safe_print(vars, philo->id, "has taken a fork");
+		
+		//eat
+		safe_print(vars, philo->id, "is eating");
+		philo->last_meal = get_time();
+		safe_sleep(vars->time_to_eat, vars);
+		philo->meals_eaten++;
+
+		//release forks
+		pthread_mutex_unlock(&vars->forks[higher_fork]);
+		pthread_mutex_unlock(&vars->forks[lower_fork]);
 }
 
 void	*philo_action(void *arg)
 {
 	t_vars	*vars;
-	int id;
 	t_philo *philo; 
 	philo = (t_philo *)arg;
 	vars = philo->vars;
-	id = philo->id;
-	int left;
-	int right;
-	id = ((t_philo *)arg)->id;
 
-	left = id;
-	right = (id + 1) % vars->nr_of_forks;
-	int lower_fork = left < right ? left : right;
-	int higher_fork = left < right ? right : left;
-	
-	//id = //get frm arg somehow
-	//t_philo	*philosopher;
-	struct timeval tv;
-
-	//philosopher = (t_philo *)arg.philos;
-	while(!philo->vars->died)
+	while(!vars->died)
 	{
-		//think
-		gettimeofday(&tv, NULL);
-		if(check_time_to_die(tv, philo->last_meal, philo))
+		eat(philo);
+		if(vars->all_full)
 			break;
-		printf("◦ %ld.%06ld %d is thinking\n", tv.tv_sec, tv.tv_usec, id);
-		usleep(vars->time_to_sleep * 1000);
-		//take forks
-		
-		pthread_mutex_lock(&vars->forks[lower_fork]);
-		gettimeofday(&tv, NULL);
-		if(check_time_to_die(tv, philo->last_meal, philo))
-			break;
-		printf("◦ %ld.%06ld %d has taken a fork\n", tv.tv_sec, tv.tv_usec, id);
-		
-			
-		pthread_mutex_lock(&vars->forks[higher_fork]);
-		gettimeofday(&tv, NULL);
-		if(check_time_to_die(tv, philo->last_meal, philo))
-			break;
-		printf("◦ %ld.%06ld %d has taken a fork\n", tv.tv_sec, tv.tv_usec, id);
-		
-		
-	
-		//eat
-		gettimeofday(&tv, NULL);
-		if(check_time_to_die(tv, philo->last_meal, philo))
-			break;
-		gettimeofday(&philo->last_meal, NULL);
-		printf("◦ %ld.%06ld %d is eating\n", tv.tv_sec, tv.tv_usec, id);
-		usleep(vars->time_to_eat * 1000);
-				//release forks
-		pthread_mutex_unlock(&vars->forks[higher_fork]);
-		pthread_mutex_unlock(&vars->forks[lower_fork]);
-		philo->meals_eaten++;
-		if(philo->meals_eaten == vars->nr_of_meals && vars->nr_of_meals != -1)
-			break;
-			
-
-
 		//sleep
-		gettimeofday(&tv, NULL);
-		if(check_time_to_die(tv, philo->last_meal, philo))
-			break;
-		printf("◦ %ld.%06ld %d is sleeping\n", tv.tv_sec, tv.tv_usec, id);
-		usleep(vars->time_to_sleep * 1000);
+		safe_print(vars, philo->id, "is sleeping");
+		safe_sleep(vars->time_to_sleep, vars);
+		//think
+		safe_print(vars, philo->id, "is thinking");
 	}
 	return (NULL);
 }
@@ -131,19 +161,21 @@ int	ft_atoi(const char *nptr)
 void	create_threads(t_vars *vars)
 {
 	unsigned int	i;
-	t_philo			*philo;
 
 	i = 0;
-	vars->philos = malloc(vars->nr_of_philos * sizeof(pthread_t));
-	philo = malloc(vars->nr_of_philos * sizeof(t_philo));
+	vars->philos = malloc(vars->nr_of_philos * sizeof(t_philo));
 	while (i < vars->nr_of_philos)
 	{
-		philo[i].id = i;
-		philo[i].vars = vars;
-		philo[i].meals_eaten = 0;
-		gettimeofday(&philo[i].last_meal, NULL);
-		pthread_create(&vars->philos[i], NULL, philo_action,
-			&philo[i]);
+		vars->philos[i].id = i;
+		vars->philos[i].vars = vars;
+		vars->philos[i].meals_eaten = 0;
+		vars->philos[i].last_meal = get_time();
+		if(pthread_create(&vars->philos[i].thread, NULL, philo_action,
+			&vars->philos[i]) != 0)
+		{
+			printf("failed to create threads");
+			exit(1);
+		}
 		i++;
 	}
 }
@@ -156,6 +188,8 @@ void	create_mutexes(t_vars *vars)
 	vars->forks = malloc(vars->nr_of_forks * sizeof(pthread_mutex_t));
 	while (i < vars->nr_of_forks)
 		pthread_mutex_init(&vars->forks[i++], NULL);
+	pthread_mutex_init(&vars->check_meal, NULL);
+	pthread_mutex_init(&vars->printing, NULL);
 }
 
 void	join_threads(t_vars *vars)
@@ -164,7 +198,7 @@ void	join_threads(t_vars *vars)
 
 	i = 0;
 	while (i < vars->nr_of_philos)
-		pthread_join(vars->philos[i++], NULL);
+		pthread_join(vars->philos[i++].thread, NULL);
 	free(vars->philos);
 }
 
@@ -175,6 +209,8 @@ void	destroy_mutexes(t_vars *vars)
 	i = 0;
 	while (i < vars->nr_of_forks)
 		pthread_mutex_destroy(&vars->forks[i++]);
+	pthread_mutex_destroy(&vars->check_meal);
+	pthread_mutex_destroy(&vars->printing);
 	free(vars->forks);
 }
 
@@ -195,6 +231,7 @@ int	main(int argc, char const *argv[])
 	vars.time_to_eat = ft_atoi(argv[3]);
 	vars.time_to_sleep = ft_atoi(argv[4]);
 	vars.died = 0;
+	vars.all_full = 0;
 	if (argc == 6)
 		vars.nr_of_meals = ft_atoi(argv[5]);
 	else
@@ -202,6 +239,7 @@ int	main(int argc, char const *argv[])
 		
 	create_mutexes(&vars);
 	create_threads(&vars);
+	death_checker(&vars);
 	join_threads(&vars);
 	destroy_mutexes(&vars);
 	return (0);

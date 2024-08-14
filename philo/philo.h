@@ -6,7 +6,7 @@
 /*   By: phartman <phartman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 16:43:34 by phartman          #+#    #+#             */
-/*   Updated: 2024/08/14 13:59:33 by phartman         ###   ########.fr       */
+/*   Updated: 2024/08/14 16:02:52 by phartman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ typedef struct s_vars
 	int nr_of_meals;
 	int died;
 	int all_full;
+	long long start_time;
 	pthread_mutex_t *forks;
 	pthread_mutex_t check_meal;
 	pthread_mutex_t printing;

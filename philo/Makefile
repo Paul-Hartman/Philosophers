@@ -3,12 +3,8 @@ CC := cc
 CFLAGS := -Wall -Wextra -Werror
 
 
-SRCS := philo.c
+SRCS := philo.c init.c end.c utils.c 
 
-BONUS_SRCS := 
-
-
-BONUS_OBJS := $(BONUS_SRCS:.c=.o)
 
 OBJS := $(SRCS:.c=.o)
 
@@ -22,18 +18,11 @@ $(NAME): $(OBJS)
  
 all: $(NAME)
 
-bonus: 
-
-$(LIBFT):
-	@make -C ./ft_printf
- 
 clean:
-	@rm -f $(OBJS) $(BONUS_OBJS)
-	@make clean -C ./ft_printf
+	@rm -f $(OBJS)
 	
 fclean: clean
-	@make fclean -C ./ft_printf
-	@rm -f $(NAME) checker
+	@rm -f $(NAME)
 
 re: fclean all
 

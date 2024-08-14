@@ -6,7 +6,7 @@
 /*   By: phartman <phartman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 16:43:34 by phartman          #+#    #+#             */
-/*   Updated: 2024/08/14 16:02:52 by phartman         ###   ########.fr       */
+/*   Updated: 2024/08/14 16:40:15 by phartman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@
 # include <string.h>
 # include <limits.h>
 #include <stddef.h>
-
 
 struct s_vars;
 

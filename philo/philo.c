@@ -6,7 +6,7 @@
 /*   By: phartman <phartman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 16:44:45 by phartman          #+#    #+#             */
-/*   Updated: 2024/08/14 16:26:13 by phartman         ###   ########.fr       */
+/*   Updated: 2024/08/14 16:54:53 by phartman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -244,9 +244,7 @@ void	join_threads(t_vars *vars)
 	i = 0;
 	while (i < vars->nr_of_philos)
 	{
-		printf("Joining thread %u\n", i);
 		pthread_join(vars->philos[i].thread, NULL);
-		printf("Joined thread %u\n", i);
 		i++;
 	}
 	free(vars->philos);
@@ -281,8 +279,8 @@ int	main(int argc, char const *argv[])
 	vars.start_time = get_time();
 	vars.died = 0;
 	vars.all_full = 0;
-	if (vars.nr_of_philos < 1 || vars.nr_of_philos > 200 || vars.time_to_die < 0
-		|| vars.time_to_eat < 0 || vars.time_to_sleep < 0)
+	if (vars.nr_of_philos < 1 || vars.nr_of_philos > 200 || vars.time_to_die < 60
+		|| vars.time_to_eat < 60 || vars.time_to_sleep < 60)
 	{
 		printf("Error: invalid arguments\n");
 		return (1);

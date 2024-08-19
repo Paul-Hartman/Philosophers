@@ -6,7 +6,7 @@
 /*   By: phartman <phartman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 18:28:36 by phartman          #+#    #+#             */
-/*   Updated: 2024/08/14 18:43:54 by phartman         ###   ########.fr       */
+/*   Updated: 2024/08/19 15:23:16 by phartman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,15 @@ long long	get_time_diff(long long cur_time, long long last_meal)
 long long	get_time(void)
 {
 	struct timeval	t;
+	long long		default_time;
 
-	gettimeofday(&t, NULL);
+	default_time = 0;
+
+	if(gettimeofday(&t, NULL) == -1)
+	{
+		printf("gettimeofday failed\n");
+		return(default_time);
+	}
 	return ((t.tv_sec * 1000 + t.tv_usec / 1000));
 }
 

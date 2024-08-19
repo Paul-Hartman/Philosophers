@@ -6,11 +6,12 @@
 /*   By: phartman <phartman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 16:44:45 by phartman          #+#    #+#             */
-/*   Updated: 2024/08/14 18:36:04 by phartman         ###   ########.fr       */
+/*   Updated: 2024/08/19 15:30:43 by phartman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
 
 void	eat(t_philo *philo)
 {
@@ -34,8 +35,8 @@ void	eat(t_philo *philo)
 	safe_print(vars, philo->id, "is eating");
 	philo->last_meal = get_time();
 	pthread_mutex_unlock(&vars->check_meal);
-	safe_sleep(vars->time_to_eat, vars);
 	philo->meals_eaten++;
+	safe_sleep(vars->time_to_eat, vars);
 	pthread_mutex_unlock(higher_fork);
 	pthread_mutex_unlock(lower_fork);
 }
@@ -49,10 +50,10 @@ void	*philo_action(void *arg)
 	vars = philo->vars;
 	if (philo->id % 2 == 0)
 		safe_sleep(1, vars);
-	while (!is_dead(vars) && (!vars->all_full || vars->nr_of_meals == -1))
+	while (!is_dead(vars) && (!(philo->meals_eaten  == vars->nr_of_meals)|| vars->nr_of_meals == -1))
 	{
 		eat(philo);
-		if (vars->all_full)
+		if (vars->all_full == 1)
 			break ;
 		safe_print(vars, philo->id, "is sleeping");
 		safe_sleep(vars->time_to_sleep, vars);

@@ -6,7 +6,7 @@
 /*   By: phartman <phartman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 16:43:34 by phartman          #+#    #+#             */
-/*   Updated: 2024/08/14 18:31:52 by phartman         ###   ########.fr       */
+/*   Updated: 2024/08/19 15:08:27 by phartman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ typedef struct s_vars
 int					main(int argc, char const *argv[]);
 void				*philo_action(void *arg);
 void				eat(t_philo *philo);
+int is_full(t_vars *vars);
 
 // utils
 int					ft_atoi(const char *nptr);

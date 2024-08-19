@@ -6,7 +6,7 @@
 /*   By: phartman <phartman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 18:23:12 by phartman          #+#    #+#             */
-/*   Updated: 2024/08/14 18:39:09 by phartman         ###   ########.fr       */
+/*   Updated: 2024/08/19 15:28:49 by phartman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,11 @@ void	check_all_full(t_vars *vars)
 		&& vars->nr_of_meals != -1)
 		i++;
 	if (i == vars->nr_of_philos)
+	{
+		pthread_mutex_lock(&vars->check_meal);
 		vars->all_full = 1;
+		pthread_mutex_unlock(&vars->check_meal);
+	}
 }
 
 void	join_threads(t_vars *vars)

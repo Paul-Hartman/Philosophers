@@ -6,14 +6,13 @@
 /*   By: phartman <phartman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 16:44:45 by phartman          #+#    #+#             */
-/*   Updated: 2024/08/19 15:30:43 by phartman         ###   ########.fr       */
+/*   Updated: 2024/09/20 17:38:52 by phartman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-
-void	eat(t_philo *philo)
+static void	eat(t_philo *philo)
 {
 	t_vars			*vars;
 	pthread_mutex_t	*lower_fork;
@@ -50,7 +49,8 @@ void	*philo_action(void *arg)
 	vars = philo->vars;
 	if (philo->id % 2 == 0)
 		safe_sleep(1, vars);
-	while (!is_dead(vars) && (!(philo->meals_eaten  == vars->nr_of_meals)|| vars->nr_of_meals == -1))
+	while (!is_dead(vars) && ((philo->meals_eaten < vars->nr_of_meals)
+			|| vars->nr_of_meals == -1))
 	{
 		eat(philo);
 		if (vars->all_full == 1)
@@ -60,6 +60,15 @@ void	*philo_action(void *arg)
 		safe_print(vars, philo->id, "is thinking");
 	}
 	return (NULL);
+}
+
+void	malloc_protection(void *ptr)
+{
+	if (ptr == NULL)
+	{
+		printf("malloc failed\n");
+		exit(1);
+	}
 }
 
 int	main(int argc, char const *argv[])

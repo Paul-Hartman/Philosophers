@@ -6,7 +6,7 @@
 /*   By: phartman <phartman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 18:28:36 by phartman          #+#    #+#             */
-/*   Updated: 2024/08/19 15:23:16 by phartman         ###   ########.fr       */
+/*   Updated: 2024/09/20 17:21:33 by phartman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,11 +54,10 @@ long long	get_time(void)
 	long long		default_time;
 
 	default_time = 0;
-
-	if(gettimeofday(&t, NULL) == -1)
+	if (gettimeofday(&t, NULL) == -1)
 	{
 		printf("gettimeofday failed\n");
-		return(default_time);
+		return (default_time);
 	}
 	return ((t.tv_sec * 1000 + t.tv_usec / 1000));
 }

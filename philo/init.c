@@ -6,7 +6,7 @@
 /*   By: phartman <phartman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 18:16:58 by phartman          #+#    #+#             */
-/*   Updated: 2024/08/14 18:22:37 by phartman         ###   ########.fr       */
+/*   Updated: 2024/09/20 17:40:02 by phartman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,15 @@ void	create_mutexes(t_vars *vars)
 
 	i = 0;
 	vars->forks = malloc(vars->nr_of_forks * sizeof(pthread_mutex_t));
+	malloc_protection(vars->forks);
 	while (i < vars->nr_of_forks)
-		pthread_mutex_init(&vars->forks[i++], NULL);
+	{
+		if (pthread_mutex_init(&vars->forks[i++], NULL))
+		{
+			printf("failed to create mutexes");
+			return ;
+		}
+	}
 	pthread_mutex_init(&vars->check_meal, NULL);
 	pthread_mutex_init(&vars->printing, NULL);
 }
@@ -46,11 +53,7 @@ void	init_philos(t_vars *vars)
 
 	i = 0;
 	vars->philos = malloc(vars->nr_of_philos * sizeof(t_philo));
-	if (vars->philos == NULL)
-	{
-		printf("malloc failed");
-		exit(1);
-	}
+	malloc_protection(vars->philos);
 	while (i < vars->nr_of_philos)
 	{
 		vars->philos[i].id = i;

@@ -6,7 +6,7 @@
 /*   By: phartman <phartman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 16:43:34 by phartman          #+#    #+#             */
-/*   Updated: 2024/08/19 15:08:27 by phartman         ###   ########.fr       */
+/*   Updated: 2024/09/20 17:39:26 by phartman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 # include <sys/time.h>
 # include <unistd.h>
 
-struct	s_vars;
+struct s_vars;
 
 typedef struct s_philo
 {
@@ -55,8 +55,7 @@ typedef struct s_vars
 // philo.c
 int					main(int argc, char const *argv[]);
 void				*philo_action(void *arg);
-void				eat(t_philo *philo);
-int is_full(t_vars *vars);
+void				malloc_protection(void *ptr);
 
 // utils
 int					ft_atoi(const char *nptr);
@@ -75,7 +74,6 @@ void				assign_forks(t_philo *philo, pthread_mutex_t **lower_fork,
 
 // end
 void				death_checker(t_vars *vars);
-void				check_all_full(t_vars *vars);
 void				destroy_mutexes(t_vars *vars);
 void				join_threads(t_vars *vars);
 int					is_dead(t_vars *vars);

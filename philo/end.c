@@ -6,7 +6,7 @@
 /*   By: phartman <phartman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 18:23:12 by phartman          #+#    #+#             */
-/*   Updated: 2024/08/19 15:28:49 by phartman         ###   ########.fr       */
+/*   Updated: 2024/09/20 17:43:05 by phartman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void	death_checker(t_vars *vars)
 	}
 }
 
-void	check_all_full(t_vars *vars)
+static void	check_all_full(t_vars *vars)
 {
 	int	i;
 
@@ -61,7 +61,11 @@ void	join_threads(t_vars *vars)
 	i = 0;
 	while (i < vars->nr_of_philos)
 	{
-		pthread_join(vars->philos[i].thread, NULL);
+		if(pthread_join(vars->philos[i].thread, NULL))
+		{
+			printf("failed to join threads");
+			exit(1);
+		}
 		i++;
 	}
 	free(vars->philos);

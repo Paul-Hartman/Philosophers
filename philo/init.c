@@ -6,7 +6,7 @@
 /*   By: phartman <phartman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 18:16:58 by phartman          #+#    #+#             */
-/*   Updated: 2024/09/26 16:51:46 by phartman         ###   ########.fr       */
+/*   Updated: 2024/09/26 17:46:12 by phartman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,15 +27,13 @@ void	init_vars(int argc, char const *argv[], t_vars *vars)
 		vars->nr_of_meals = -1;
 }
 
-
-
 int	create_mutexes(t_vars *vars)
 {
 	int	i;
 
 	i = 0;
 	vars->forks = malloc(vars->nr_of_forks * sizeof(pthread_mutex_t));
-	if(!vars->forks)
+	if (!vars->forks)
 		return (1);
 	while (i < vars->nr_of_forks)
 	{
@@ -55,7 +53,7 @@ int	init_philos(t_vars *vars)
 
 	i = 0;
 	vars->philos = malloc(vars->nr_of_philos * sizeof(t_philo));
-	if(!vars->philos)
+	if (!vars->philos)
 		return (1);
 	while (i < vars->nr_of_philos)
 	{
@@ -78,11 +76,8 @@ int	create_threads(t_vars *vars)
 	while (i < vars->nr_of_philos)
 	{
 		if (pthread_create(&vars->philos[i].thread, NULL, philo_action,
-				&vars->philos[i]) != 0)
-		{
-			printf("failed to create threads");
+				&vars->philos[i]))
 			return (1);
-		}
 		i++;
 	}
 	return (0);

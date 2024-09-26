@@ -6,7 +6,7 @@
 /*   By: phartman <phartman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 18:23:12 by phartman          #+#    #+#             */
-/*   Updated: 2024/09/26 16:53:55 by phartman         ###   ########.fr       */
+/*   Updated: 2024/09/26 17:32:43 by phartman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,6 @@ static int	check_all_full(t_vars *vars)
 		return (1);
 	return (0);
 }
-
 
 void	join_threads(t_vars *vars)
 {

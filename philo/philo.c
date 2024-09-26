@@ -6,11 +6,14 @@
 /*   By: phartman <phartman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 16:44:45 by phartman          #+#    #+#             */
-/*   Updated: 2024/09/26 17:27:21 by phartman         ###   ########.fr       */
+/*   Updated: 2024/09/26 17:52:39 by phartman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+static int	initialize(t_vars *vars);
+static void	eat(t_philo *philo);
 
 static void	eat(t_philo *philo)
 {
@@ -62,10 +65,27 @@ void	*philo_action(void *arg)
 	return (NULL);
 }
 
+static int	initialize(t_vars *vars)
+{
+	if (create_mutexes(vars))
+	{
+		printf("Error: failed to create mutexes\n");
+		return (1);
+	}
+	init_philos(vars);
+	if (create_threads(vars))
+	{
+		printf("Error: failed to create threads\n");
+		destroy_mutexes(vars);
+		return (1);
+	}
+	return (0);
+}
 
 int	main(int argc, char const *argv[])
 {
 	t_vars	vars;
+
 	if (argc < 5 || argc > 6)
 	{
 		printf("Error: wrong number of arguments\n");
@@ -74,23 +94,13 @@ int	main(int argc, char const *argv[])
 	init_vars(argc, argv, &vars);
 	if (vars.nr_of_philos < 1 || vars.nr_of_philos > 200
 		|| vars.time_to_die < 60 || vars.time_to_eat < 60
-		|| vars.time_to_sleep < 60)
+		|| vars.time_to_sleep < 60 || vars.nr_of_meals < -1)
 	{
 		printf("Error: invalid arguments\n");
 		return (1);
 	}
-	if(create_mutexes(&vars))
-	{
-		printf("Error: failed to create mutexes\n");
+	if (initialize(&vars))
 		return (1);
-	}
-	init_philos(&vars);
-	if (create_threads(&vars))
-	{
-		printf("Error: failed to create threads\n");
-		destroy_mutexes(&vars);
-		return (1);
-	}
 	death_checker(&vars);
 	join_threads(&vars);
 	destroy_mutexes(&vars);

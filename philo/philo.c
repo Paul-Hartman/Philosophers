@@ -6,7 +6,7 @@
 /*   By: phartman <phartman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 16:44:45 by phartman          #+#    #+#             */
-/*   Updated: 2024/09/20 17:38:52 by phartman         ###   ########.fr       */
+/*   Updated: 2024/09/26 17:27:21 by phartman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ void	*philo_action(void *arg)
 			|| vars->nr_of_meals == -1))
 	{
 		eat(philo);
-		if (vars->all_full == 1)
+		if (philo->meals_eaten == vars->nr_of_meals)
 			break ;
 		safe_print(vars, philo->id, "is sleeping");
 		safe_sleep(vars->time_to_sleep, vars);
@@ -62,19 +62,10 @@ void	*philo_action(void *arg)
 	return (NULL);
 }
 
-void	malloc_protection(void *ptr)
-{
-	if (ptr == NULL)
-	{
-		printf("malloc failed\n");
-		exit(1);
-	}
-}
 
 int	main(int argc, char const *argv[])
 {
 	t_vars	vars;
-
 	if (argc < 5 || argc > 6)
 	{
 		printf("Error: wrong number of arguments\n");
@@ -88,9 +79,18 @@ int	main(int argc, char const *argv[])
 		printf("Error: invalid arguments\n");
 		return (1);
 	}
-	create_mutexes(&vars);
+	if(create_mutexes(&vars))
+	{
+		printf("Error: failed to create mutexes\n");
+		return (1);
+	}
 	init_philos(&vars);
-	create_threads(&vars);
+	if (create_threads(&vars))
+	{
+		printf("Error: failed to create threads\n");
+		destroy_mutexes(&vars);
+		return (1);
+	}
 	death_checker(&vars);
 	join_threads(&vars);
 	destroy_mutexes(&vars);

@@ -6,7 +6,7 @@
 /*   By: phartman <phartman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 16:43:34 by phartman          #+#    #+#             */
-/*   Updated: 2024/09/20 17:39:26 by phartman         ###   ########.fr       */
+/*   Updated: 2024/09/26 16:52:04 by phartman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 # include <sys/time.h>
 # include <unistd.h>
 
-struct s_vars;
+struct	s_vars;
 
 typedef struct s_philo
 {
@@ -44,7 +44,6 @@ typedef struct s_vars
 	int				time_to_sleep;
 	int				nr_of_meals;
 	int				died;
-	int				all_full;
 	long long		start_time;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	check_meal;
@@ -55,7 +54,6 @@ typedef struct s_vars
 // philo.c
 int					main(int argc, char const *argv[]);
 void				*philo_action(void *arg);
-void				malloc_protection(void *ptr);
 
 // utils
 int					ft_atoi(const char *nptr);
@@ -66,9 +64,9 @@ long long			get_time_diff(long long cur_time, long long last_meal);
 
 // init
 void				init_vars(int argc, char const *argv[], t_vars *vars);
-void				create_mutexes(t_vars *vars);
-void				init_philos(t_vars *vars);
-void				create_threads(t_vars *vars);
+int					create_mutexes(t_vars *vars);
+int					init_philos(t_vars *vars);
+int					create_threads(t_vars *vars);
 void				assign_forks(t_philo *philo, pthread_mutex_t **lower_fork,
 						pthread_mutex_t **higher_fork);
 

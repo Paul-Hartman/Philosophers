@@ -6,7 +6,7 @@
 /*   By: phartman <phartman@student.42berlin.de>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/14 18:16:58 by phartman          #+#    #+#             */
-/*   Updated: 2024/09/20 17:40:02 by phartman         ###   ########.fr       */
+/*   Updated: 2024/09/26 16:51:46 by phartman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ void	init_vars(int argc, char const *argv[], t_vars *vars)
 	vars->time_to_sleep = ft_atoi(argv[4]);
 	vars->nr_of_forks = vars->nr_of_philos;
 	vars->died = 0;
-	vars->all_full = 0;
 	vars->start_time = get_time();
 	if (argc == 6)
 		vars->nr_of_meals = ft_atoi(argv[5]);
@@ -28,32 +27,36 @@ void	init_vars(int argc, char const *argv[], t_vars *vars)
 		vars->nr_of_meals = -1;
 }
 
-void	create_mutexes(t_vars *vars)
+
+
+int	create_mutexes(t_vars *vars)
 {
 	int	i;
 
 	i = 0;
 	vars->forks = malloc(vars->nr_of_forks * sizeof(pthread_mutex_t));
-	malloc_protection(vars->forks);
+	if(!vars->forks)
+		return (1);
 	while (i < vars->nr_of_forks)
 	{
 		if (pthread_mutex_init(&vars->forks[i++], NULL))
-		{
-			printf("failed to create mutexes");
-			return ;
-		}
+			return (1);
 	}
-	pthread_mutex_init(&vars->check_meal, NULL);
-	pthread_mutex_init(&vars->printing, NULL);
+	if (pthread_mutex_init(&vars->check_meal, NULL))
+		return (1);
+	if (pthread_mutex_init(&vars->printing, NULL))
+		return (1);
+	return (0);
 }
 
-void	init_philos(t_vars *vars)
+int	init_philos(t_vars *vars)
 {
 	int	i;
 
 	i = 0;
 	vars->philos = malloc(vars->nr_of_philos * sizeof(t_philo));
-	malloc_protection(vars->philos);
+	if(!vars->philos)
+		return (1);
 	while (i < vars->nr_of_philos)
 	{
 		vars->philos[i].id = i;
@@ -64,9 +67,10 @@ void	init_philos(t_vars *vars)
 		vars->philos[i].last_meal = get_time();
 		i++;
 	}
+	return (0);
 }
 
-void	create_threads(t_vars *vars)
+int	create_threads(t_vars *vars)
 {
 	int	i;
 
@@ -77,10 +81,11 @@ void	create_threads(t_vars *vars)
 				&vars->philos[i]) != 0)
 		{
 			printf("failed to create threads");
-			exit(1);
+			return (1);
 		}
 		i++;
 	}
+	return (0);
 }
 
 void	assign_forks(t_philo *philo, pthread_mutex_t **lower_fork,

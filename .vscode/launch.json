@@ -2,13 +2,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "C/C++: gcc build and debug active file",
+            "name": "Debug philo",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/philo/philo",
-            "args": ["5", "800", "200", "200", "7"],
+            "program": "${workspaceFolder}/philo",
+            "args": ["4", "310", "200", "100"],
             "stopAtEntry": false,
-            "cwd": "${fileDirname}",
+            "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
@@ -19,11 +19,9 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "C/C++: gcc build active file",
+            "preLaunchTask": "make",
             "miDebuggerPath": "/usr/bin/gdb",
             "logging": {
-                "trace": true,
-                "traceResponse": true,
                 "engineLogging": true
             }
         }
